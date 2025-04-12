@@ -366,7 +366,7 @@ class auto_analyst(dspy.Module):
         print(f"Plan: {plan['plan']}")
         print(f"Plan Description: {plan['plan_desc']}")
 
-        output_dict=[]
+        output_dict={}
         output_dict['analytical_planner'] = plan
         plan_list =[]
         code_list =[]
