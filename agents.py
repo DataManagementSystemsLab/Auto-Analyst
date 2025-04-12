@@ -389,7 +389,8 @@ class auto_analyst(dspy.Module):
        #Loops through all of the agents in the plan
         for p in plan_list:
             # fetches the inputs
-            inputs = {x:dict_[x] for x in self.agent_inputs[p.strip()]}
+            print(p)
+            inputs = {x:context[x] for x in self.agent_inputs[p.strip()]}
             output_dict[p.strip()]=self.agents[p.strip()](**inputs)
             code = output_dict[p.strip()].code
             
