@@ -1,7 +1,7 @@
 import dspy
 
 import memory_agents as m
-
+import global_state as gs
 # Contains the DSPy agents
 
 
@@ -302,7 +302,7 @@ class auto_analyst_ind(dspy.Module):
         inputs_context = {
             'dataset': self.dataset.retrieve(query)[0].text,
             'styling_index': self.styling_index.retrieve(query)[0].text,
-            'hint': global_state["st_memory"],
+            'hint': gs.global_state["st_memory"],
             'goal': query,
             'Agent_desc': str(self.agent_desc)
         }
@@ -316,12 +316,12 @@ class auto_analyst_ind(dspy.Module):
         for key, value in dict(result).items():
             if key != 'rationale':
                 print(f"{specified_agent}[{key}]:\n{value}")
-                global_state["messages"].append(f"{specified_agent}[{key}]: {value}")
+                gs.global_state["messages"].append(f"{specified_agent}[{key}]: {value}")
 
         memory_key = f"memory_{specified_agent.strip()}"
         summary = self.memory_summarize_agent(agent_response=f"{specified_agent} {result.get('code', '')}\n{result.get('commentary', '')}", user_goal=query).summary
         output_dict[memory_key] = summary
-        global_state["st_memory"].insert(0, f"{memory_key} : {summary}")
+        gs.global_state["st_memory"].insert(0, f"{memory_key} : {summary}")
 
         return output_dict
 
@@ -353,7 +353,7 @@ class auto_analyst(dspy.Module):
         context = {
             'dataset': self.dataset.retrieve(query)[0].text,
             'styling_index': self.styling_index.retrieve(query)[0].text,
-            'hint': global_state["st_memory"],
+            'hint': gs.global_state["st_memory"],
             'goal': query,
             'Agent_desc': str(self.agent_desc)
         }
@@ -366,7 +366,7 @@ class auto_analyst(dspy.Module):
         print(f"Plan: {plan['plan']}")
         print(f"Plan Description: {plan['plan_desc']}")
         
-        global_state["messages"].append(f"planner['plan']: {plan['plan']}")
-        global_state["messages"].append(f"planner['plan_desc']: {plan['plan_desc']}")
+        gs.global_state["messages"].append(f"planner['plan']: {plan['plan']}")
+        gs.global_state["messages"].append(f"planner['plan_desc']: {plan['plan_desc']}")
 
         return plan
