@@ -70,7 +70,7 @@ def safe_to_datetime(date):
 df['datetime_column'] = df['datetime_column'].apply(safe_to_datetime)
 
 You will be given recent history as a hint! Use that to infer what the user is saying
-You are logged in streamlit use st.write instead of print
+You are logged in Google Colab use print for logging
 If visualizing use plotly
 
 
@@ -159,7 +159,7 @@ print(result)
 
 
     You may be give recent agent interactions as a hint! With the first being the latest
-    You are logged in streamlit use st.write instead of print
+    You are logged in Google Colab use print for logging
 If visualizing use plotly
 
 
@@ -180,7 +180,7 @@ class sk_learn_agent(dspy.Signature):
     Make sure your output is as intended!
 
     You may be give recent agent interactions as a hint! With the first being the latest
-    You are logged in streamlit use st.write instead of print
+    You are logged in Google Colab use print for logging
 
     
     """
@@ -206,15 +206,21 @@ class code_combiner_agent(dspy.Signature):
 
     Double check column_names/dtypes using dataset, also check if applied logic works for the datatype
     df.copy = df.copy()
-    Change print to st.write
+    
     Also add this to display Plotly chart
-    st.plotly_chart(fig, use_container_width=True)
+    
+    Make sure to import the following "from IPython.display import display"
+
+    
+    To diplay the figure use
+    fig.show()
+    
 
 
 
     Make sure your output is as intended!
         You may be give recent agent interactions as a hint! With the first being the latest
-    You are logged in streamlit use st.write instead of print
+    You are logged in Google Colab use print for logging
 
 
     """
@@ -245,7 +251,7 @@ class data_viz_agent(dspy.Signature):
     You may be give recent agent interactions as a hint! With the first being the latest
     DONT INCLUDE GOAL/DATASET/STYLING INDEX IN YOUR OUTPUT!
     You can add trendline into a scatter plot to show it changes,only if user mentions for it in the query!
-    You are logged in streamlit use st.write instead of print
+    You are logged in Google Colab use print for logging
 
     """
     goal = dspy.InputField(desc="user defined goal which includes information about data and chart they want to plot")
@@ -266,7 +272,7 @@ You are an AI specializing in fixing faulty data analytics code provided by anot
 
 Additional requirements:  
 - Ensure the corrected code performs the intended analysis as described by the user.  
-- Since the environment is Streamlit, use `st.write` instead of `print`.  
+- The environment is Goole colab.  
 - Output **only the corrected code** without any additional explanation or comments.  
 - Ensure the final code runs end-to-end without errors.  
 
