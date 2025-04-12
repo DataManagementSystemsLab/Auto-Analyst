@@ -365,8 +365,51 @@ class auto_analyst(dspy.Module):
         print("\n**This is the proposed plan**")
         print(f"Plan: {plan['plan']}")
         print(f"Plan Description: {plan['plan_desc']}")
-        
-        global_state["messages"].append(f"planner['plan']: {plan['plan']}")
-        global_state["messages"].append(f"planner['plan_desc']: {plan['plan_desc']}")
 
-        return plan
+        output_dict=[]
+        output_dict['analytical_planner'] = plan
+        plan_list =[]
+        code_list =[]
+        messages=global_state['messages']
+        st_memory=global_state['st_memory']
+        analysis_list = [plan.plan,plan.plan_desc]
+        #splits the plan and shows it to the user
+        if plan.plan.split('->'):
+            plan_text = plan.plan
+            plan_text = plan.plan.replace('Plan','').replace(':','').strip()
+            print(plan_text)
+            print(plan.plan_desc)
+            plan_list = plan_text.split('->')
+        else:
+            # if the planner agent fails at routing the query to any agent this is triggered
+            refined_goal = self.refine_goal(dataset=dict_['dataset'], goal=dict_['goal'], Agent_desc= dict_['Agent_desc'])
+            messages.append(f"refined_goal: {refined_goal.refined_goal}")
+
+            self.forward(query=refined_goal.refined_goal)
+       #Loops through all of the agents in the plan
+        for p in plan_list:
+            # fetches the inputs
+            inputs = {x:dict_[x] for x in self.agent_inputs[p.strip()]}
+            output_dict[p.strip()]=self.agents[p.strip()](**inputs)
+            code = output_dict[p.strip()].code
+            
+            # st.write("This is the generated Code"+ code)
+            commentary = output_dict[p.strip()].commentary
+            print('**'+p.strip().capitalize().replace('_','  ')+' -  is working on this analysis....**')
+            messages.append(f"{p.strip()}['code']: {output_dict[p.strip()].code}")
+            messages.append(f"{p.strip()}['commentary']: {output_dict[p.strip()].commentary}")
+
+
+            print(commentary.replace('#',''))
+            print(code)
+            # stores each of the individual agents code and commentary into seperate lists
+            code_list.append(code)
+            analysis_list.append(commentary)
+            print("Combining all code into one")
+            output_dict['code_combiner_agent'] = self.code_combiner_agent(agent_code_list = str(code_list), dataset=dict_['dataset'])
+            messages.append(f"code_combiner_agent: {output_dict['code_combiner_agent']}")
+            output_dict['memory_combined'] = str(self.memory_summarize_agent(agent_response='code_combiner_agent'+'\n'+str(output_dict['code_combiner_agent'].refined_complete_code), user_goal=query).summary)
+            st_memory.insert(0,f"{'memory_combined'} : {output_dict['memory_combined']}")
+
+            return output_dict
+        
